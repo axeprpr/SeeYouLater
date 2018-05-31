@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <title>碎钺无声</title>
+</head>
+
+<body>
+    <div id="app">
+        <!-- 卡片式首页 -->
+        <el-container>
+            <el-header></el-header>
+            <el-main class="maincss">
+                <el-row :gutter="10">
+                    <el-col :xs="12" :sm="6">
+                        <div>
+                            <el-card shadow="hover" class="cardcss">
+                                <div style="padding: 14px;">
+                                    <p class="p1">链接</p>
+                                    <p class="p2"></p>
+                                </div>
+                            </el-card>
+                        </div>
+                    </el-col>
+                    <el-col :xs="12" :sm="6" v-for="link in links">
+                        <div @click="jump2(link.url)">
+                            <el-card shadow="hover" class="cardcss">
+                                <div style="padding: 14px;">
+                                    <p class="p1">{{ link.name }}</p>
+                                    <p class="p2">{{ link.desc }}</p>
+                                </div>
+                            </el-card>
+                        </div>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="10">
+                    <el-col :xs="12" :sm="8" :md="4" v-for="n in 10">
+                        <el-card shadow="hover" class="cardcss">
+                            <div style="padding: 14px;">
+                                <span>ASUE ROUTER</span>
+                                <div class="bottom clearfix">
+                                    <time class="time">{{ }}</time>
+                                </div>
+                            </div>
+                        </el-card>
+                    </el-col>
+                </el-row>
+            </el-main>
+        </el-container>
+    </div>
+</body>
+<!-- import Vue before Element -->
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<!-- import axio -->
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+new Vue({
+    el: '#app',
+    data: {
+        links: [],
+    },
+    created() {
+        this.getLink()
+    },
+    methods: {
+        post(url, data) {
+            return new Promise((resolve, reject) => {
+                axios({
+                    url: url,
+                    method: 'post',
+                    data: data,
+                    transformRequest: [function(data) {
+                        // Do whatever you want to transform the data
+                        let ret = ''
+                        for (let it in data) {
+                            ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+                        }
+                        return ret
+                    }],
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                }).then(response => { resolve(response.data); }, err => { reject(err); })
+            })
+        },
+        get(url, param) {
+            param = param || {}
+            return new Promise((resolve, reject) => {
+                axios.get(url, {
+                        params: param
+                    })
+                    .then(response => { resolve(response.data); }, err => { reject(err); })
+            })
+        },
+        jump2(e) {
+            window.location = "http://www.baidu.com";
+        },
+        postLink(name, desc, url) {
+        data = {
+            name: name,
+            desc: desc,
+            url: url
+        }
+        this.post('/link', data)
+    },
+    getLink() {
+        this.get('/link').then((res) => {
+            this.links = res
+        });
+    }
+}
+})
+</script>
+<style>
+.maincss {
+    padding: 5% 20%
+}
+
+.cardcss {
+    height: 100px;
+    margin-bottom: 15px
+}
+
+.cardcss .p1 {
+    font-size: 15px;    
+    margin: 0;
+}
+
+.cardcss .p2 {
+    font-size: 12px;    
+    margin: 0;
+}
+
+
+</style>
+
+</html>
